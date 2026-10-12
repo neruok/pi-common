@@ -1,0 +1,75 @@
+{
+  "name": "@neruok/pi-common",
+  "version": "0.1.0",
+  "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/" },
+  "repository": { "type": "git", "url": "https://github.com/neruok/pi-common.git" },
+  "homepage": "https://github.com/neruok/pi-common#readme",
+  "bugs": { "url": "https://github.com/neruok/pi-common/issues" },
+  "type": "module",
+  "description": "Shared behavior for Neruok Pi extensions",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    "./model-types": { "types": "./dist/model-types.d.ts", "import": "./dist/model-types.js" },
+    "./model-picker": {
+      "types": "./dist/model-picker.d.ts",
+      "import": "./dist/model-picker.js"
+    },
+    "./models": {
+      "types": "./dist/models.d.ts",
+      "import": "./dist/models.js"
+    },
+    "./settings": {
+      "types": "./dist/settings.d.ts",
+      "import": "./dist/settings.js"
+    },
+    "./commands": {
+      "types": "./dist/commands.d.ts",
+      "import": "./dist/commands.js"
+    },
+    "./presentation": {
+      "types": "./dist/presentation.d.ts",
+      "import": "./dist/presentation.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "docs/pi-common.md"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-ai": {
+      "optional": true
+    },
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    },
+    "@earendil-works/pi-tui": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "1.0.4",
+    "@earendil-works/pi-coding-agent": "1.0.4",
+    "@earendil-works/pi-tui": "1.0.4",
+    "typescript": "5.9.3",
+    "@types/node": "26.6.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "check": "node --test tests/*.test.mjs",
+    "check:consumers": "node --test integration/*.test.mjs",
+    "verify": "npm run build && npm run check",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run verify"
+  }
+}
