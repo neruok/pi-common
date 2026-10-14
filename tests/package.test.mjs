@@ -11,7 +11,7 @@ const run = promisify(execFile);
 const root = fileURLToPath(new URL('../', import.meta.url));
 async function pack(source, dir) {
   await mkdir(dir, { recursive: true });
-  const { stdout } = await run('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', dir], { cwd: source, timeout: 60000 });
+  const { stdout } = await run('npm', ['pack', '--json', '--ignore-scripts', '--dry-run=false', '--pack-destination', dir], { cwd: source, timeout: 60000 });
   const report = JSON.parse(stdout);
   const [artifact] = Array.isArray(report) ? report : Object.values(report);
   assert.equal(artifact.bundled.length, 0);

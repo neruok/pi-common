@@ -50,12 +50,12 @@ test('CC-AC-1 common command constants cannot mutate shared behavior', () => {
 test('CC-AC-6 npm installs the archive independently without host SDK copies', async t => {
   const dir = await mkdtemp(join(tmpdir(), 'pi-common-npm-install-'));
   t.after(() => rm(dir, { recursive: true, force: true }));
-  const report = JSON.parse(execFileSync('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', dir], { cwd: root, encoding: 'utf8', timeout: 60000 }));
+  const report = JSON.parse(execFileSync('npm', ['pack', '--json', '--ignore-scripts', '--dry-run=false', '--pack-destination', dir], { cwd: root, encoding: 'utf8', timeout: 60000 }));
   const [pack] = Array.isArray(report) ? report : Object.values(report);
   const isolated = join(dir, 'isolated');
   await import('node:fs/promises').then(fs => fs.mkdir(isolated));
   await writeFile(join(isolated, 'package.json'), JSON.stringify({ name: 'isolated-common', private: true, type: 'module' }));
-  execFileSync('npm', ['install', '--ignore-scripts', '--legacy-peer-deps', '--no-audit', '--no-fund', join(dir, pack.filename)], { cwd: isolated, encoding: 'utf8', timeout: 60000 });
+  execFileSync('npm', ['install', '--ignore-scripts', '--dry-run=false', '--legacy-peer-deps', '--no-audit', '--no-fund', join(dir, pack.filename)], { cwd: isolated, encoding: 'utf8', timeout: 60000 });
   assert.deepEqual((await readdir(join(isolated, 'node_modules'))).filter(name => name !== '.package-lock.json'), ['@neruok']);
   const installed = JSON.parse(await readFile(join(isolated, 'node_modules/@neruok/pi-common/package.json'), 'utf8'));
   assert.equal(installed.version, manifest.version);

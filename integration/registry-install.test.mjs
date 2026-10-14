@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 const run = promisify(execFile);
 const root = fileURLToPath(new URL('../', import.meta.url));
 const artifacts = {
-  'pi-advisor': { version: '0.2.0', integrity: 'sha512-Rq53MjWhIr79ZGG/PmxCXzWBkwvnGft0vZXTYUcxECrOdn2P8vmS0WTIHo1DNyIVRpRX+v1L05BeQf+yPAo77g==' },
-  'pi-magic8ball': { version: '0.2.0', integrity: 'sha512-Rq53MjWhIr79ZGG/PmxCXzWBkwvnGft0vZXTYUcxECrOdn2P8vmS0WTIHo1DNyIVRpRX+v1L05BeQf+yPAo77g==' },
+  'pi-advisor': { version: '0.2.0', integrity: 'sha512-7Xf/lQ+TbAgYZJJHzpkiorR+/9yC6/I2POiFv+t1visQRJeU656Z/ZseTnsMeHsGsHYK58VigEtbNYqOAUFO6Q==' },
+  'pi-magic8ball': { version: '0.2.0', integrity: 'sha512-7Xf/lQ+TbAgYZJJHzpkiorR+/9yC6/I2POiFv+t1visQRJeU656Z/ZseTnsMeHsGsHYK58VigEtbNYqOAUFO6Q==' },
   'pi-compaction-model': { version: '0.1.0', integrity: 'sha512-8I3zVAP6kO1QgWbgiosEQIPfoQrSiwu04ustT7OhYcPYDXnsPkRpwYmluMv/dtSeE7TEaDGp86ba4kQjRiA7VQ==' },
 };
 for (const project of ['pi-advisor', 'pi-magic8ball', 'pi-compaction-model']) {
