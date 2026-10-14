@@ -9,13 +9,19 @@ import { fileURLToPath } from 'node:url';
 
 const run = promisify(execFile);
 const root = fileURLToPath(new URL('../', import.meta.url));
+const artifacts = {
+  'pi-advisor': { version: '0.2.0', integrity: 'sha512-Rq53MjWhIr79ZGG/PmxCXzWBkwvnGft0vZXTYUcxECrOdn2P8vmS0WTIHo1DNyIVRpRX+v1L05BeQf+yPAo77g==' },
+  'pi-magic8ball': { version: '0.2.0', integrity: 'sha512-Rq53MjWhIr79ZGG/PmxCXzWBkwvnGft0vZXTYUcxECrOdn2P8vmS0WTIHo1DNyIVRpRX+v1L05BeQf+yPAo77g==' },
+  'pi-compaction-model': { version: '0.1.0', integrity: 'sha512-8I3zVAP6kO1QgWbgiosEQIPfoQrSiwu04ustT7OhYcPYDXnsPkRpwYmluMv/dtSeE7TEaDGp86ba4kQjRiA7VQ==' },
+};
 for (const project of ['pi-advisor', 'pi-magic8ball', 'pi-compaction-model']) {
+  const { version, integrity } = artifacts[project];
   test(`CC-AC-6 COMMON-AC-1 ${project} installs through Pi with the registry common dependency`, async t => {
     const dir = await mkdtemp(join(tmpdir(), 'pi-registry-install-'));
     t.after(() => rm(dir, { recursive: true, force: true }));
     const source = join(root, '../../../', project, 'worktrees/main');
     const manifest = JSON.parse(await readFile(join(source, 'package.json'), 'utf8'));
-    assert.deepEqual(manifest.dependencies, { '@neruok/pi-common': '0.1.0' });
+    assert.deepEqual(manifest.dependencies, { '@neruok/pi-common': version });
     const output = await run('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', dir], { cwd: source });
     const report = JSON.parse(output.stdout);
     const pack = Array.isArray(report) ? report[0] : Object.values(report)[0];
@@ -44,16 +50,16 @@ for (const project of ['pi-advisor', 'pi-magic8ball', 'pi-compaction-model']) {
       const pkg = JSON.parse(await readFile(join(installed, 'package.json'), 'utf8'));
       assert.equal(pkg.name, ${JSON.stringify(manifest.name)});
       assert.equal(pkg.version, ${JSON.stringify(manifest.version)});
-      assert.deepEqual(pkg.dependencies, { '@neruok/pi-common': '0.1.0' });
+      assert.deepEqual(pkg.dependencies, { '@neruok/pi-common': ${JSON.stringify(version)} });
       const modules = join(agentDir, 'npm/node_modules');
       assert.deepEqual((await readdir(modules)).filter(name => name !== '.package-lock.json'), ['@neruok']);
       assert.deepEqual((await readdir(join(modules, '@neruok'))).sort(), ${JSON.stringify([project, 'pi-common'].sort())});
       const commonRoot = join(modules, '@neruok/pi-common');
       assert.equal((await lstat(commonRoot)).isSymbolicLink(), false);
       const common = JSON.parse(await readFile(join(commonRoot, 'package.json'), 'utf8'));
-      assert.equal(common.version, '0.1.0'); assert.equal(common.dependencies, undefined);
+      assert.equal(common.version, ${JSON.stringify(version)}); assert.equal(common.dependencies, undefined);
       const lock = JSON.parse(await readFile(join(agentDir, 'npm/package-lock.json'), 'utf8'));
-      assert.equal(lock.packages['node_modules/@neruok/pi-common'].integrity, 'sha512-8I3zVAP6kO1QgWbgiosEQIPfoQrSiwu04ustT7OhYcPYDXnsPkRpwYmluMv/dtSeE7TEaDGp86ba4kQjRiA7VQ==');
+      assert.equal(lock.packages['node_modules/@neruok/pi-common'].integrity, ${JSON.stringify(integrity)});
       await assert.rejects(access(join(commonRoot, 'node_modules')), e => e.code === 'ENOENT');
       const loader = new DefaultResourceLoader({ cwd, agentDir, settingsManager: settings,
         noPromptTemplates: true, noThemes: true, noContextFiles: true,

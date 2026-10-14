@@ -1,6 +1,6 @@
 {
   "name": "@neruok/pi-common",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/" },
   "repository": { "type": "git", "url": "https://github.com/neruok/pi-common.git" },
   "homepage": "https://github.com/neruok/pi-common#readme",
@@ -13,6 +13,8 @@
   },
   "exports": {
     "./model-types": { "types": "./dist/model-types.d.ts", "import": "./dist/model-types.js" },
+    "./diagnostics": { "types": "./dist/diagnostics.d.ts", "import": "./dist/diagnostics.js" },
+    "./deadlines": { "types": "./dist/deadlines.d.ts", "import": "./dist/deadlines.js" },
     "./model-picker": {
       "types": "./dist/model-picker.d.ts",
       "import": "./dist/model-picker.js"

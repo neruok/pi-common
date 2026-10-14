@@ -1,7 +1,11 @@
 import { fuzzyFilter, type AutocompleteItem } from '@earendil-works/pi-tui';
-import { REASONING_LEVELS, type PickerModel, type ModelSelection } from './model-types.js';
+import { REASONING_LEVELS, type PickerModel, type ModelSelection, type Reasoning } from './model-types.js';
 
 export interface Choice { value: string; description: string }
+/** Format caller-discovered levels without lookup, filtering, or reordering. */
+export function reasoningChoices(levels: readonly Reasoning[]): Choice[] {
+  return levels.map(value => ({ value, description: value === 'default' ? 'Keep legacy provider behavior' : `Set reasoning to ${value}` }));
+}
 export type Scope = 'global' | 'project';
 export const SCOPE_CHOICES: readonly Readonly<Choice>[] = Object.freeze([
   Object.freeze({ value: '--global', description: 'Use global settings (default save scope)' }),

@@ -11,6 +11,7 @@ import { selectModel, ModelPickerError } from '@neruok/pi-common/model-picker';
 import { supportedReasoning, supportsReasoning } from '@neruok/pi-common/models';
 import { SettingsError, readSettingsBytes, decodeSettings, updateJsonSettings, replaceJsonSettings, loadScopedSettings, settingsPaths } from '@neruok/pi-common/settings';
 import { argumentCompletions, scopedArguments, completionContext } from '@neruok/pi-common/commands';
+import * as commands from '@neruok/pi-common/commands';
 import { sanitizeText, sanitizeLabel, reportCommand } from '@neruok/pi-common/presentation';
 
 async function fixture(t) {
@@ -144,6 +145,31 @@ test('CC-AC-3 global/project loading ignores untrusted files and replaces whole 
   await writeFile(paths.project, '{');
   assert.equal((await loadScopedSettings(paths, false, 16000, parse)).settings.model.model, 'a');
   await assert.rejects(loadScopedSettings(paths, true, 16000, parse), kind('invalid-config'));
+});
+
+test('CC-AC-4 reasoning choices preserve caller order, descriptions and independent results', () => {
+  assert.equal(typeof commands.reasoningChoices, 'function', 'commands must expose the shared reasoning-choice formatter');
+  const levels = Object.freeze(['high', 'default', 'off', 'high']);
+  const expected = [
+    { value: 'high', description: 'Set reasoning to high' },
+    { value: 'default', description: 'Keep legacy provider behavior' },
+    { value: 'off', description: 'Set reasoning to off' },
+    { value: 'high', description: 'Set reasoning to high' },
+  ];
+  assert.deepEqual(commands.reasoningChoices(levels), expected);
+  assert.deepEqual(commands.reasoningChoices([]), []);
+  assert.deepEqual(commands.reasoningChoices(['minimal', 'low', 'medium', 'xhigh', 'max']), [
+    { value: 'minimal', description: 'Set reasoning to minimal' },
+    { value: 'low', description: 'Set reasoning to low' },
+    { value: 'medium', description: 'Set reasoning to medium' },
+    { value: 'xhigh', description: 'Set reasoning to xhigh' },
+    { value: 'max', description: 'Set reasoning to max' },
+  ]);
+  const first = commands.reasoningChoices(levels);
+  first[0].description = 'Changed';
+  first.pop();
+  assert.deepEqual(commands.reasoningChoices(levels), expected);
+  assert.deepEqual(levels, ['high', 'default', 'off', 'high']);
 });
 
 test('CC-AC-4 completion preserves whitespace, scopes, ranking and silent failures', async () => {

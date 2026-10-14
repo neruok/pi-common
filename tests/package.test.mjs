@@ -23,7 +23,7 @@ async function extract(archive, target) {
   assert.equal((await lstat(target)).isSymbolicLink(), false);
 }
 
-test('CC-AC-1 packed library has typed subpaths and provider-free modules load without Pi', async t => {
+test('CC-AC-1 CC-AC-9 packed library has typed subpaths and provider-free modules load without Pi', async t => {
   const dir = await mkdtemp(join(tmpdir(), 'pi-common-archive-'));
   t.after(() => rm(dir, { recursive: true, force: true }));
   const { path, artifact } = await pack(root, join(dir, 'archive'));
@@ -35,6 +35,10 @@ test('CC-AC-1 packed library has typed subpaths and provider-free modules load w
   assert.equal(pkg.pi, undefined);
   assert.equal(pkg.dependencies, undefined);
   assert.equal(pkg.exports['.'], undefined);
+  for (const subpath of ['./diagnostics', './deadlines']) {
+    assert.ok(pkg.exports[subpath]?.types, `${subpath} must declare its types`);
+    assert.ok(pkg.exports[subpath]?.import, `${subpath} must declare its runtime`);
+  }
   const paths = new Set(artifact.files.map(file => file.path));
   for (const required of ['LICENSE', 'README.md', 'package.json']) assert.ok(paths.has(required), required);
   for (const [subpath, entry] of Object.entries(pkg.exports)) {
@@ -51,6 +55,11 @@ test('CC-AC-1 packed library has typed subpaths and provider-free modules load w
     const settings = await import('@neruok/pi-common/settings');
     const presentation = await import('@neruok/pi-common/presentation');
     const types = await import('@neruok/pi-common/model-types');
+    const diagnostics = await import('@neruok/pi-common/diagnostics');
+    const deadlines = await import('@neruok/pi-common/deadlines');
+    assert.equal(diagnostics.providerErrorCategory({ status: 429 }), 'rate-limit');
+    assert.equal(deadlines.remainingBudgetMs(10, 20, 15), 15);
+    assert.equal(deadlines.remainingDeadlineMs(30, 15), 15);
     assert.equal(typeof settings.updateJsonSettings, 'function');
     assert.equal(presentation.sanitizeLabel('a\\nb'), 'a b');
     assert.ok(types.REASONING_LEVELS.includes('default'));
